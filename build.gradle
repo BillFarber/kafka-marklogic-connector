@@ -235,6 +235,22 @@ task copyConnectorToConfluent(type: Copy, group: confluentTestingGroup, dependsO
   into "${confluentHome}/share/confluent-hub-components"
 }
 
+// Installs the connector using defaults for parameters. This means:
+//  1) It uses $CONFLUENT_HOME to determine which CP installation to use
+//  2) It automatically uninstalls any current version of the connector
+//  3) It automatically adds the "confluent-hub-components" directory to all known worker properties files
+task installConnectorInConfluent(type: Exec, group: confluentTestingGroup, dependsOn: [connectorArchive]) {
+  description = "Uses 'Confluent-hub' to install the connector in your local Confluent Platform"
+  commandLine "confluent-hub", "install", "--no-prompt", "build/distro/${baseArchiveName}.zip"
+  ignoreExitValue = true
+}
+
+task installDatagenConnectorInConfluent(type: Exec, group: confluentTestingGroup, dependsOn: [connectorArchive]) {
+  description = "Uses 'Confluent-hub' to install the connector in your local Confluent Platform"
+  commandLine "confluent-hub", "install", "--no-prompt", "confluentinc/kafka-connect-datagen:0.6.0"
+  ignoreExitValue = true
+}
+
 // See https://docs.confluent.io/confluent-cli/current/command-reference/local/confluent_local_destroy.html
 task destroyLocalConfluent(type: Exec, group: confluentTestingGroup) {
   description = "Destroy the local Confluent Platform instance"
